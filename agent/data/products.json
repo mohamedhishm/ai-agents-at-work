@@ -1,0 +1,102 @@
+[
+  {
+    "product_id": "PROD-001",
+    "name": "فلاتر زيت Bosch",
+    "category": "فلتر زيت",
+    "part_number": "BOS-CH-001",
+    "price": 120,
+    "available_quantity": 0,
+    "supplier": "Bosch Egypt",
+    "reorder_threshold": 5
+  },
+  {
+    "product_id": "PROD-002",
+    "name": "فلاتر زيت Denso",
+    "category": "فلتر زيت",
+    "part_number": "DNS-CH-002",
+    "price": 200,
+    "available_quantity": 3,
+    "supplier": "Denso Middle East",
+    "reorder_threshold": 5
+  },
+  {
+    "product_id": "PROD-003",
+    "name": "قطرات فرامل ATE",
+    "category": "نظام الفرامل",
+    "part_number": "ATE-BR-303",
+    "price": 220,
+    "available_quantity": 8,
+    "supplier": "ATE Egypt",
+    "reorder_threshold": 3
+  },
+  {
+    "product_id": "PROD-004",
+    "name": "قطران حلزوني",
+    "category": "الزيت والمواد اللزجة",
+    "part_number": "GMP-SE-004",
+    "price": 50,
+    "available_quantity": 0,
+    "supplier": "GMP Chemicals",
+    "reorder_threshold": 10
+  },
+  {
+    "product_id": "PROD-005",
+    "name": "إطارة أمامية 16 بوصة",
+    "category": "الإطارات والطرق",
+    "part_number": "WSM-TT-005",
+    "price": 400,
+    "available_quantity": 2,
+    "supplier": "Warsaw Tires Co.",
+    "reorder_threshold": 4
+  },
+  {
+    "product_id": "PROD-006",
+    "name": "زيت محرك 5W-30 4L",
+    "category": "الزيت والمواد اللزجة",
+    "part_number": "SLK-0W30-006",
+    "price": 300,
+    "available_quantity": 15,
+    "supplier": "Shell Egypt",
+    "reorder_threshold": 5
+  },
+  {
+    "product_id": "PROD-007",
+    "name": "فلتر هواء Mahle",
+    "category": "فلتر هواء",
+    "part_number": "MHL-AF-007",
+    "price": 150,
+    "available_quantity": 20,
+    "supplier": "Mahle Egypt",
+    "reorder_threshold": 5
+  },
+  {
+    "product_id": "PROD-008",
+    "name": "بطارية 12V 60Ah",
+    "category": "البطاريات والكهرباء",
+    "part_number": "GSE-12V-008",
+    "price": 1800,
+    "available_quantity": 4,
+    "supplier": "GS Egypt",
+    "reorder_threshold": 3
+  },
+  {
+    "product_id": "PROD-009",
+    "name": "سائل تكييف",
+    "category": "التبريد والمكيف",
+    "part_number": "ALT-AC-009",
+    "price": 100,
+    "available_quantity": 1,
+    "supplier": "Al-Turk Chemicals",
+    "reorder_threshold": 5
+  },
+  {
+    "product_id": "PROD-010",
+    "name": "حزمة إضاءة LED",
+    "category": "الإضاءة والإلكترونيات",
+    "part_number": "LED-PA-010",
+    "price": 250,
+    "available_quantity": 7,
+    "supplier": "LED Tech Egypt",
+    "reorder_threshold": 5
+  }
+]
