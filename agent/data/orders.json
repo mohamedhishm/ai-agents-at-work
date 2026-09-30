@@ -1,0 +1,14 @@
+[
+	{
+		"order_id": "ORD-001",
+		"customer_id": "CUST-001",
+		"items": [
+			{
+				"product_id": "PROD-001",
+				"quantity": 1
+			}
+		],
+		"status": "pending",
+		"total": 29.99
+	}
+]

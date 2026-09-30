@@ -1,0 +1,13 @@
+[
+	{
+		"shipment_id": "SHIP-001",
+		"supplier": "Sample Supplier",
+		"items": [
+			{
+				"product_id": "PROD-001",
+				"quantity": 10
+			}
+		],
+		"status": "expected"
+	}
+]
