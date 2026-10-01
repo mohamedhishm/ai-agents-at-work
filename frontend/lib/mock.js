@@ -81,11 +81,65 @@ export const mock = {
     activity = [{ id: Date.now(), type: "Approval", detail: `Order #${id} ${ok ? "approved" : "rejected"} by admin`, status: "done" }, ...activity];
     return wait({});
   },
-  message: (text) => {
-    const input = (text || "").trim();
-    const id = 1047 + orders.length;
-    orders = [{ id, title: input.replace(/^Order\s+/i, "") || "Spare-parts request", customer: "Salma Mohamed", amount: 189, status: "pending_approval", eta: "After approval", location: "Human approval queue" }, ...orders];
-    activity = [{ id: Date.now(), type: "Task created", detail: `New spare-parts request #${id} from chat`, status: "pending_approval" }, ...activity];
-    return wait({ reply: `Request #${id} has been created and sent for administrator approval.`, status: "pending_approval", intent: "new_request" });
-  },
+  cancel: (id) => {
+  orders = orders.map((o) =>
+    o.id === id
+      ? {
+          ...o,
+          status: "cancelled",
+          eta: "Cancelled",
+          location: "Order cancelled by customer",
+        }
+      : o
+  );
+
+  activity = [
+    {
+      id: Date.now(),
+      type: "Cancellation",
+      detail: `Order #${id} cancelled by customer`,
+      status: "done",
+    },
+    ...activity,
+  ];
+
+  return wait({});
+},
+  message: (text, orderData = {}) => {
+  const input = (text || "").trim();
+  const id = 1047 + orders.length;
+
+  orders = [
+    {
+      id,
+      title:
+        input.replace(/^Order\s+/i, "") ||
+        "Spare-parts request",
+      customer: "Salma Mohamed",
+      amount: 189,
+      status: "pending_approval",
+      eta: "After approval",
+      location: "Human approval queue",
+      delivery_address: orderData.delivery_address || "",
+      payment_method: orderData.payment_method || "",
+    },
+    ...orders,
+  ];
+
+  activity = [
+    {
+      id: Date.now(),
+      type: "Task created",
+      detail: `New spare-parts request #${id} from chat`,
+      status: "pending_approval",
+    },
+    ...activity,
+  ];
+
+  return wait({
+    reply: `Request #${id} has been created and sent for administrator approval.`,
+    status: "pending_approval",
+    intent: "new_request",
+  });
+},
 };
