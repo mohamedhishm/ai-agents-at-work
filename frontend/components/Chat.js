@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { AgentAPI, TaskAPI } from "@/lib/api";
 
 const isStockRequest = (value) => {
@@ -462,13 +464,18 @@ export default function Chat({ onReply }) {
       if (isStockRequest(m)) {
         lastResults.current = STOCK;
 
-        const reply =
-          "Here is our current inventory stock:\n\n" +
-          STOCK.map(
-            (p, i) =>
-              `${i + 1}. ${p.title} — ${p.stock} units in stock — EGP ${p.price}`
-          ).join("\n") +
-          '\n\nReply with a number to place an order (e.g., "I want 1").';
+        const reply = [
+        "Here is our current inventory stock:",
+        "",
+        "| # | Part | Stock | Price |",
+        "|---|------|-------|-------|",
+        ...STOCK.map(
+           (p, i) =>
+            `| ${i + 1} | ${p.title} | ${p.stock} units | EGP ${p.price} |`
+        ),
+        "",
+        'Reply with a number to place an order (e.g., "I want 1").',
+      ].join("\n");
 
         setMsgs((p) => [
           ...p,
@@ -523,22 +530,30 @@ export default function Chat({ onReply }) {
         lastResults.current = results;
 
         const reply = matches.length
-          ? "I found these matching spare parts:\n\n" +
-            results
-              .map(
-                (p, i) =>
-                  `${i + 1}. ${p.title} — ${p.stock} units — EGP ${p.price}`
-              )
-              .join("\n") +
-            '\n\nReply with a number to order (e.g. "I want 1").'
-          : "I couldn't find an exact match, but here are our available spare parts:\n\n" +
-            results
-              .map(
-                (p, i) =>
-                  `${i + 1}. ${p.title} — ${p.stock} units — EGP ${p.price}`
-              )
-              .join("\n") +
-            '\n\nReply with a number to order (e.g. "I want 1").';
+         ? [
+           "I found these matching spare parts:",
+           "",
+           "| # | Part | Stock | Price |",
+           "|---|------|-------|-------|",
+           ...results.map(
+            (p, i) =>
+             `| ${i + 1} | ${p.title} | ${p.stock} units | EGP ${p.price} |`
+           ),
+           "",
+          'Reply with a number to order (e.g. "I want 1").',
+         ].join("\n")
+       : [
+           "I couldn't find an exact match, but here are our available spare parts:",
+           "",
+           "| # | Part | Stock | Price |",
+           "|---|------|-------|-------|",
+           ...results.map(
+          (p, i) =>
+             `| ${i + 1} | ${p.title} | ${p.stock} units | EGP ${p.price} |`
+           ),
+           "",
+          'Reply with a number to order (e.g. "I want 1").',
+          ].join("\n");
 
         setMsgs((p) => [
           ...p,
@@ -704,8 +719,9 @@ ${
         {
           from: "bot",
           text:
-            "An error occurred while connecting to the assistant. Please try again.",
+            "I couldn't connect to the assistant right now. Please check your connection and try again.",
           error: true,
+          retry: m,
         },
       ]);
     } finally {
@@ -737,8 +753,19 @@ ${
             className={`msg ${m.from} ${m.error ? "err" : ""}`}
           >
             <div className="msg-content">
-              {m.text}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {m.text}
+              </ReactMarkdown>
             </div>
+            {m.retry && (
+              <button
+                className="retry-btn"
+                onClick={() => send(m.retry)}
+                disabled={busy}
+              >
+               ↻ Try again
+              </button>
+            )}
 
             {m.paymentOptions && (
               <div className="payment-options">
@@ -800,9 +827,7 @@ ${
 
         {busy && (
           <div className="msg bot typing">
-            <span />
-            <span />
-            <span />
+            <span>Thinking...</span>
           </div>
         )}
       </div>
