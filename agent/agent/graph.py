@@ -88,6 +88,47 @@ def clear_conversation_state(conversation_id: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Role & authorization
+# ---------------------------------------------------------------------------
+
+VALID_ROLES = {"customer", "admin"}
+
+ADMIN_ONLY_TOOL_NAMES = {
+    "get_inventory_summary",
+    "get_low_stock_items",
+    "prepare_reorder",
+    "list_reorder_drafts",
+}
+
+def _validate_user_role(user_role: str) -> str:
+    """Validate user_role at the backend boundary.
+
+    The role is trusted input from the backend — the Agent enforces
+    business/tool-level authorization based on it.
+    """
+    if user_role not in VALID_ROLES:
+        raise ValueError(
+            f"Invalid user_role: {user_role!r}. Must be 'customer' or 'admin'."
+        )
+    return user_role
+
+
+def _check_tool_authorization(tool_calls: list[dict], user_role: str) -> str | None:
+    """Return an error message if the role is not authorized for any tool call.
+
+    Returns None if authorized, or an Arabic error string if blocked.
+    """
+    if user_role == "customer" and tool_calls:
+        for tc in tool_calls:
+            if tc.get("name") in ADMIN_ONLY_TOOL_NAMES:
+                return (
+                    "⚠️ غير مسموح. أدوات الأدمن مخصصة للأدمن فقط. "
+                    "تواصل مع الأدمن للاستفسار عن المخزون أو إعادة الطلب."
+                )
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Custom State for multi-turn workflows
 # ---------------------------------------------------------------------------
 
@@ -553,6 +594,11 @@ def create_agent_graph(
         else:
             tool_calls = []
 
+        # Authorization guard: customer cannot call admin-only tools
+        auth_error = _check_tool_authorization(tool_calls, user_role)
+        if auth_error:
+            return {"messages": [AIMessage(content=auth_error)]}
+
         result = {"messages": [response]}
 
         # Check if a propose_order ToolMessage was just executed
@@ -700,6 +746,9 @@ def invoke_agent(
             - action_executed: Name of action executed (if any)
             - state_changed: Whether state was modified
     """
+    # Validate role at the backend boundary
+    _validate_user_role(user_role)
+
     if conversation_id is None:
         conversation_id = str(uuid.uuid4())[:8]
 

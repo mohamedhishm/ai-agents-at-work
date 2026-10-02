@@ -204,7 +204,6 @@ def create_admin_tools(store: Store):
         search_products,
         check_stock,
         get_product_details,
-        create_order,
         get_order_status,
         get_customer_orders,
         # Admin tools
