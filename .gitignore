@@ -1,2 +1,9 @@
 temp.md
 .env
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+*.tmp

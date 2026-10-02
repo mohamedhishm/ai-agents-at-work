@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Nour Hussien",
+    "email": "nour@eldoctor.com",
+    "password": "demo1234",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "name": "Salma Mohamed",
+    "email": "salma@eldoctor.com",
+    "password": "demo1234",
+    "role": "customer"
+  },
+  {
+    "id": 3,
+    "name": "Omar El-Azab",
+    "email": "omar.alazaab@gmail.com",
+    "password": "12345678",
+    "role": "customer"
+  }
+]
