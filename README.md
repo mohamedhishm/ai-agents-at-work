@@ -373,9 +373,15 @@ Potential next steps include:
 
 ---
 
-## 👥 Team
+## 👥 Team — The Shifters
 
-**The Shifters**
+- **Mohamed Hisham**
+- **Salma Mohamed**
+- **Nour Hussien**
+- **Omar El Azab**
+- **Kareem Wahba**
+
+Built by **The Shifters** for the **Agents at Work Hackathon**.
 
 Built for the **Agents at Work Hackathon**.
 
