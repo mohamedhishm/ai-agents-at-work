@@ -16,7 +16,7 @@ Invoker = Callable[..., dict[str, Any]]
 
 def _default_invoker() -> Invoker:
     # Imported lazily: langgraph/langchain are heavy and need GROQ_API_KEY.
-    from agent.agent.graph import invoke_agent
+    from eldockor.graph import invoke_agent
 
     return invoke_agent
 

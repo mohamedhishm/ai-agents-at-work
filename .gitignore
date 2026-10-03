@@ -1,9 +1,6 @@
 temp.md
 .env
+.env.local
+node_modules/
+.next/
 __pycache__/
-*.py[cod]
-.venv/
-.env
-.pytest_cache/
-.ruff_cache/
-*.tmp

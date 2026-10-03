@@ -10,7 +10,7 @@ class InventoryService:
 
     def _get_store(self):
         if self._store is None:
-            from agent.agent.store.file_store import FileStore
+            from eldockor.store.file_store import FileStore
 
             self._store = FileStore()
         return self._store

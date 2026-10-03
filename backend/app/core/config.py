@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+# Ensure PYTHONPATH includes project root for agent module resolution
+_project_root = Path(__file__).resolve().parents[3]  # backend/app/core/config.py -> project root
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
 
 # <repo>/backend  (app/core/config.py -> parents[2])
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -60,7 +66,7 @@ def _load_settings() -> Settings:
         ),
         users_file=Path(os.getenv("USERS_FILE", BASE_DIR / "data" / "users.json")),
         orders_file=Path(
-            os.getenv("ORDERS_FILE", BASE_DIR / "agent" / "data" / "orders.json")
+            os.getenv("ORDERS_FILE", BASE_DIR / "eldockor" / "data" / "orders.json")
         ),
     )
     if settings.is_production and settings.jwt_secret == _INSECURE_DEFAULT_SECRET:
