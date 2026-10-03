@@ -1,114 +1,388 @@
-# ELDOCTOR AI Agent — Auto Parts & Services
+# ELDOCTOR AI Operations Agent
 
-AI agent for Egyptian SME auto-parts business (ELDOCTOR). Built for the **Agents at Work** hackathon.
+> **An AI-powered operations agent for Egyptian auto-parts SMEs**
 
-## Purpose
+Built by **The Shifters** for the **Agents at Work Hackathon**.
 
-ELDOCTOR helps Egyptian auto-parts shops automate:
-- Product search & inventory lookup
-- Order proposals with stock-aware quantity capping
-- Deterministic order confirmation (no LLM-dependent financial decisions)
-- Admin inventory & reorder management
+ELDOCTOR AI Operations Agent helps auto-parts businesses manage customer requests, inventory, and orders through a single intelligent interface instead of relying on manual searches across multiple sources.
 
-## Architecture
+---
 
+## 💡 The Problem
+
+Auto-parts businesses often manage daily operations across **WhatsApp, phone calls, Excel files, and paper records**.
+
+This creates repetitive manual work when employees need to:
+
+- Search for products and availability
+- Check stock quantities
+- Track customer orders
+- Handle repetitive customer questions
+- Reconcile information across different sources
+- Prepare inventory and reorder information
+
+As order volume grows, the business needs more manual effort to handle the same operational workflow.
+
+---
+
+## 🤖 Our Solution
+
+**ELDOCTOR AI Operations Agent** acts as an intelligent bridge between users and the business data.
+
+Customers can interact with the agent to:
+
+- Search for auto parts
+- Check product availability and quantity
+- View product details
+- Request specific quantities
+- Create and track orders
+
+Admins can use the agent to:
+
+- Check inventory
+- View low-stock products
+- Review operational information
+- Prepare reorder drafts
+- Manage business operations through agent tools
+
+The goal is not simply to answer questions, but to connect the user's request with the appropriate **data, tools, and business workflow**.
+
+---
+
+## 🏗️ Architecture
+
+```text
+┌───────────────┐
+│   Frontend    │
+│   Next.js     │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│    Backend    │
+│    FastAPI    │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│  Agent Layer  │
+│   LangGraph   │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│     Tools     │
+│ Customer/Admin│
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐
+│   FileStore   │
+│     JSON      │
+└───────────────┘
 ```
-Frontend (Next.js) → Backend (FastAPI) → Agent (LangGraph) → Tools → FileStore (JSON)
+
+### Project Structure
+
+```text
+ELDOCTOR/
+├── eldockor/       # Agent, LangGraph graph, tools, FileStore
+├── backend/        # FastAPI API, authentication, agent endpoint
+└── frontend/       # Next.js web application
 ```
 
-- **eldockor/** — Agent package (MockLLM, LangGraph graph, customer + admin tools, FileStore)
-- **backend/** — FastAPI server (auth JWT, /agents/message endpoint)
-- **frontend/** — Next.js chat UI
+---
 
-## Implemented Capabilities
+## ✨ Key Capabilities
 
-✅ Product search (by name/category)
-✅ Stock check with quantity
-✅ Product details
-✅ Order proposal via `propose_order` tool (when requested qty > available)
-✅ Deterministic confirmation ("أيوه" → create order, "لا" → cancel)
-✅ Duplicate confirmation blocked (idempotency key + pending state consumption)
-✅ Conversation isolation (separate conversations per user)
-✅ Admin tools: inventory summary, low-stock items, reorder drafts
-✅ Role-based authorization (customer ≠ admin)
-✅ MockLLM (deterministic fallback, no GROQ_API_KEY needed)
+### Customer Operations
 
-## Setup
+- 🔎 Product search by name or category
+- 📦 Real-time stock lookup from business data
+- 📋 Product details
+- 🛒 Quantity-aware order proposals
+- 📌 Order confirmation workflow
+- 📍 Order status lookup
+- 🔐 Customer-specific conversation isolation
+
+### Admin Operations
+
+- 📊 Inventory summary
+- ⚠️ Low-stock detection
+- 🔄 Reorder draft generation
+- 📦 Inventory lookup
+- 🔐 Role-based access control
+
+---
+
+## 🔒 Transaction Safety
+
+A key design principle is that the **LLM does not make the final decision to create an order**.
+
+The order workflow is:
+
+```text
+User Request
+     ↓
+Agent understands the request
+     ↓
+Check product & available stock
+     ↓
+Generate Order Proposal
+     ↓
+User Confirmation
+     ↓
+Deterministic Order Creation
+     ↓
+Order ID Returned
+```
+
+For example:
+
+```text
+User: عايز 10 من PROD-003
+
+Agent:
+Available stock = 6
+Order proposal = 6 units
+
+User: أيوه
+
+Agent:
+Order created → ORD-XXX
+```
+
+If the user does not confirm, the order is not created.
+
+### Safety Properties
+
+- Explicit confirmation before order creation
+- Deterministic order execution
+- Duplicate confirmation protection
+- Pending-state consumption
+- Conversation isolation
+- Customer/Admin role separation
+
+---
+
+## 🧠 Agent, Not Just a Chatbot
+
+The agent follows a tool-based workflow instead of simply generating text.
+
+```text
+User Request
+     ↓
+Intent Understanding
+     ↓
+Select Required Tool
+     ↓
+Access Business Data
+     ↓
+Apply Business Rules
+     ↓
+Return Result / Execute Action
+```
+
+For example, when a customer asks for a product, the agent can search the inventory data and return the available quantity instead of guessing.
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Technology |
+|---|---|
+| Frontend | Next.js |
+| Backend | FastAPI |
+| Agent Framework | LangGraph |
+| Language Model | Groq / MockLLM fallback |
+| Data Store | JSON FileStore |
+| Authentication | JWT |
+| Language | Python / TypeScript |
+
+---
+
+## 🚀 Setup
+
+### 1. Install Dependencies
 
 ```bash
-# 1. Install dependencies
-cd backend && pip install -r requirements.txt
-cd frontend && npm install
+cd backend
+pip install -r requirements.txt
 
-# 2. Create .env files
+cd ../frontend
+npm install
+```
+
+### 2. Configure Environment Variables
+
+Create the required `.env` files:
+
+```bash
 cp backend/.env.example backend/.env
 cp eldockor/.env.example eldockor/.env
-# Add GROQ_API_KEY=your_key in eldockor/.env (or leave empty for MockLLM)
-
-# 3. Seed data is already present in JSON files (no seed script needed)
 ```
 
-## Environment Variables
+`GROQ_API_KEY` is optional for the demo because the project includes a deterministic **MockLLM fallback**.
 
-| Variable | Location | Purpose |
-|----------|----------|---------|
-| `GROQ_API_KEY` | `eldockor/.env` | Groq API key (optional — MockLLM used if absent) |
-| `NEXT_PUBLIC_API_URL` | `frontend/.env.local` | Backend URL (default: `http://localhost:8000`) |
+### Environment Variables
 
-## Startup
+| Variable | Location | Description |
+|---|---|---|
+| `GROQ_API_KEY` | `eldockor/.env` | Optional Groq API key |
+| `NEXT_PUBLIC_API_URL` | `frontend/.env.local` | Backend URL |
+
+Default backend URL:
+
+```text
+http://localhost:8000
+```
+
+---
+
+## ▶️ Run the Application
+
+### Backend
 
 ```bash
-# Terminal 1 — Backend
 cd backend
 PYTHONPATH=<project_root> python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
 
-# Terminal 2 — Frontend
+### Frontend
+
+In another terminal:
+
+```bash
 cd frontend
 npm run dev
 ```
 
-## Test Instructions
+Then open the frontend in your browser.
+
+---
+
+## 🧪 Testing
+
+The project includes automated tests covering the main agent and transaction-safety workflows.
 
 ```bash
 cd eldockor
 PYTHONPATH=<project_root> python test_phase1.py
 ```
 
-All 28 scenarios should pass (Phase 1–7).
+Expected result:
 
-## Demo Workflow
+```text
+28/28 PASS
+```
 
-1. Login: `salma@eldoctor.com` / `demo1234`
-2. Send: `عايز فلتر زيت` → see search results
-3. Send: `عايز 10 من PROD-003` → pending order proposed (capped to available stock)
-4. Send: `أيوه` → order created (ORD-XXX)
-5. Send: `أيوه` again → duplicate blocked (same order_id)
+The test suite covers scenarios across the implemented agent phases, including order proposals, confirmation, duplicate prevention, authorization, and conversation isolation.
 
-## Security / Transaction Safety
+---
 
-### `create_order` Tool Exposure
+## 🎬 Demo Workflow
 
-The `create_order` tool IS exposed to the LLM in both `tools_customer.py` and `tools_admin.py`. The LLM CAN call it directly.
+A simple customer flow:
 
-### How the Confirmation Flow Works
+### 1. Login
 
-1. User requests an order → LLM calls `propose_order` (not `create_order`)
-2. Graph detects `propose_order` ToolMessage → creates pending state
-3. User confirms with "أيوه" → Graph intercepts and calls `FileStore.create_order()` deterministically
-4. User says "لا" → Graph clears pending state
+```text
+Email: salma@eldoctor.com
+Password: demo1234
+```
 
-### Security Properties
+### 2. Search for a product
 
-- **Confirmation required**: User must explicitly confirm with "أيوه" before order is created
-- **Deterministic execution**: Order creation happens in Python code, not via LLM tool call
-- **Duplicate prevention**: Idempotency key + pending state consumption
-- **Conversation isolation**: Different conversations don't share pending state
-- **Role-based authorization**: Customer cannot access admin tools (enforced at backend)
+```text
+عايز فلتر زيت
+```
 
-## Known Limitations / Future Work
+### 3. Request a quantity
 
-- MockLLM is rule-based (not intelligent) — replace with real LLM when GROQ_API_KEY is set
-- FileStore is JSON-based (not a database) — suitable for demo, not production scale
-- No RAG / vector DB (out of scope for hackathon)
-- Frontend confirmation bar works but needs real-browser testing
-- GROQ_API_KEY placeholder in repo — replace before production
+```text
+عايز 10 من PROD-003
+```
+
+If the requested quantity is greater than available stock, the agent creates a proposal based on the available quantity.
+
+### 4. Confirm
+
+```text
+أيوه
+```
+
+The order is created and an order ID is returned.
+
+### 5. Test Duplicate Confirmation
+
+```text
+أيوه
+```
+
+The system prevents the same pending order from being created again.
+
+---
+
+## 📈 Business Impact
+
+ELDOCTOR AI Operations Agent is designed to reduce repetitive operational work and help SMEs handle more requests without increasing the same amount of manual effort.
+
+### Time Saved
+
+Instead of manually searching across multiple sources for every request, employees can use the agent to retrieve operational information directly.
+
+### Cost Saved
+
+Reducing repetitive manual work can reduce the number of employee hours required for routine operational tasks.
+
+### Revenue Opportunity
+
+Faster responses to availability and pricing questions can reduce missed sales opportunities caused by slow manual verification.
+
+### Accuracy
+
+Centralizing the interaction with business data reduces unnecessary manual transfers between paper, Excel, WhatsApp, and employees.
+
+---
+
+## ⚠️ Current Limitations
+
+This project is a **hackathon prototype**, not a production deployment.
+
+Current limitations include:
+
+- JSON-based FileStore instead of a production database
+- MockLLM available as a deterministic fallback
+- No RAG/vector database
+- Browser testing of some frontend interactions is still limited
+- Production deployment, monitoring, and scaling are outside the current scope
+
+---
+
+## 🔮 Future Improvements
+
+Potential next steps include:
+
+- Replace FileStore with PostgreSQL or another production database
+- Add RAG for business documentation and product knowledge
+- Integrate WhatsApp directly
+- Add supplier and delivery workflows
+- Add analytics and operational dashboards
+- Add production-grade authentication and monitoring
+- Support larger inventories and higher request volumes
+
+---
+
+## 👥 Team
+
+**The Shifters**
+
+Built for the **Agents at Work Hackathon**.
+
+Our goal was to transform a real SME operational problem into an agentic workflow that reduces manual work, improves response time, and gives the business more operational capacity.
+
+---
+
+## 📌 Demo
+
+The repository contains the complete implementation and test scenarios required to run and evaluate the agent locally.
